@@ -59,7 +59,7 @@ def _copy_payload(chat_id):
     if len(vidid) == _YT_ID_LEN and track.get("streamtype") in ("youtube", "live"):
         link = f"https://www.youtube.com/watch?v={vidid}"
     text = f"{title}\n{link}".strip()
-    return text[:256] or None
+    return text[:256] or None  # Telegram copy limit is 256 chars
 
 
 def _copy_btn(text, payload):
@@ -156,17 +156,15 @@ def build_now_playing_markup(
             [queue_btn, _btn(_["PLAYER_BTN_MORE"], f"nowplaying_more {chat_id}")]
         )
 
-    rows.append(
-        [_btn(_["CLOSE_BUTTON"], "close", ButtonStyle.DANGER)]
-    )
+    rows.append([_btn(_["CLOSE_BUTTON"], "close", ButtonStyle.DANGER)])
     return InlineKeyboardMarkup(rows)
 
 
 def build_queue_markup(_, chat_id, qid):
     """Keyboard of a track that was added to a running queue.
 
-        ▶️ Play Now
-        ⏭ Skip | ❌ End
+        🎧 (Play Now)
+        ⏭ Skip | ✖ Close
     """
     return InlineKeyboardMarkup(
         [
@@ -179,7 +177,7 @@ def build_queue_markup(_, chat_id, qid):
             ],
             [
                 _btn(_["PLAYER_BTN_SKIP"], f"ADMIN Skip|{chat_id}"),
-                _btn(_["PLAYER_BTN_END"], f"ADMIN Stop|{chat_id}", ButtonStyle.DANGER),
+                _btn(_["CLOSE_BUTTON"], "close", ButtonStyle.DANGER),
             ],
         ]
     )
