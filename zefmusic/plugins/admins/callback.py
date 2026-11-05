@@ -178,6 +178,24 @@ async def del_back_playlist(client, CallbackQuery, _):
             _["admin_4"].format(mention), reply_markup=close_markup(_)
         )
     elif command == "Stop" or command == "End":
+        # Queue card (has the Play Now button): its red button must only close the card
+        try:
+            _rows = CallbackQuery.message.reply_markup.inline_keyboard
+            _is_queue_card = any(
+                (_b.callback_data or "").startswith("ADMIN PlayNow")
+                for _r in _rows
+                for _b in _r
+            )
+        except Exception:
+            _is_queue_card = False
+        if _is_queue_card:
+            await CallbackQuery.answer()
+            try:
+                await CallbackQuery.message.delete()
+            except Exception:
+                pass
+            return
+
         await CallbackQuery.answer()
         await zef.stop_stream(chat_id)
         await set_loop(chat_id, 0)
